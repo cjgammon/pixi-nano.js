@@ -20,23 +20,23 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
 
     // sprites
     Sprite:                 require('./sprites/Sprite'),
-    ParticleContainer:      require('./particles/ParticleContainer'),
+    //ParticleContainer:      require('./particles/ParticleContainer'),
     SpriteRenderer:         require('./sprites/webgl/SpriteRenderer'),
-    ParticleRenderer:       require('./particles/webgl/ParticleRenderer'),
+    //ParticleRenderer:       require('./particles/webgl/ParticleRenderer'),
 
     // text
-    Text:                   require('./text/Text'),
+    //Text:                   require('./text/Text'),
 
     // primitives
-    Graphics:               require('./graphics/Graphics'),
-    GraphicsData:           require('./graphics/GraphicsData'),
-    GraphicsRenderer:       require('./graphics/webgl/GraphicsRenderer'),
+    //Graphics:               require('./graphics/Graphics'),
+    //GraphicsData:           require('./graphics/GraphicsData'),
+    //GraphicsRenderer:       require('./graphics/webgl/GraphicsRenderer'),
 
     // textures
     Texture:                require('./textures/Texture'),
     BaseTexture:            require('./textures/BaseTexture'),
-    RenderTexture:          require('./textures/RenderTexture'),
-    VideoBaseTexture:       require('./textures/VideoBaseTexture'),
+    //RenderTexture:          require('./textures/RenderTexture'),
+    //VideoBaseTexture:       require('./textures/VideoBaseTexture'),
     TextureUvs:             require('./textures/TextureUvs'),
 
     // renderers - canvas
@@ -45,16 +45,16 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
     CanvasBuffer:           require('./renderers/canvas/utils/CanvasBuffer'),
 
     // renderers - webgl
-    WebGLRenderer:          require('./renderers/webgl/WebGLRenderer'),
-    ShaderManager:          require('./renderers/webgl/managers/ShaderManager'),
-    Shader:                 require('./renderers/webgl/shaders/Shader'),
-    ObjectRenderer:         require('./renderers/webgl/utils/ObjectRenderer'),
-    RenderTarget:           require('./renderers/webgl/utils/RenderTarget'),
+    //WebGLRenderer:          require('./renderers/webgl/WebGLRenderer'),
+    //ShaderManager:          require('./renderers/webgl/managers/ShaderManager'),
+    //Shader:                 require('./renderers/webgl/shaders/Shader'),
+    //ObjectRenderer:         require('./renderers/webgl/utils/ObjectRenderer'),
+    //RenderTarget:           require('./renderers/webgl/utils/RenderTarget'),
 
     // filters - webgl
-    AbstractFilter:         require('./renderers/webgl/filters/AbstractFilter'),
-    FXAAFilter:             require('./renderers/webgl/filters/FXAAFilter'),
-    SpriteMaskFilter:       require('./renderers/webgl/filters/SpriteMaskFilter'),
+    //AbstractFilter:         require('./renderers/webgl/filters/AbstractFilter'),
+    //FXAAFilter:             require('./renderers/webgl/filters/FXAAFilter'),
+    //SpriteMaskFilter:       require('./renderers/webgl/filters/SpriteMaskFilter'),
 
     /**
      * This helper function will automatically detect which renderer you should be using.
@@ -75,16 +75,16 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
      *
      * @return {WebGLRenderer|CanvasRenderer} Returns WebGL renderer if available, otherwise CanvasRenderer
      */
-    autoDetectRenderer: function (width, height, options, noWebGL)
-    {
-        width = width || 800;
-        height = height || 600;
+    //autoDetectRenderer: function (width, height, options, noWebGL)
+    //{
+    //    width = width || 800;
+    //    height = height || 600;
 
-        if (!noWebGL && core.utils.isWebGLSupported())
-        {
-            return new core.WebGLRenderer(width, height, options);
-        }
+    //    if (!noWebGL && core.utils.isWebGLSupported())
+    //    {
+    //        return new core.WebGLRenderer(width, height, options);
+    //    }
 
-        return new core.CanvasRenderer(width, height, options);
-    }
+    //    return new core.CanvasRenderer(width, height, options);
+    //}
 });
