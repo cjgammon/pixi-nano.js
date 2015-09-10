@@ -2379,7 +2379,7 @@ Container.prototype.destroy = function (destroyChildren)
     this.children = null;
 };
 
-},{"../math":12,"../textures/RenderTexture":40,"./DisplayObject":8}],8:[function(require,module,exports){
+},{"../math":12,"../textures/RenderTexture":45,"./DisplayObject":8}],8:[function(require,module,exports){
 var math = require('../math'),
     RenderTexture = require('../textures/RenderTexture'),
     EventEmitter = require('eventemitter3'),
@@ -2845,7 +2845,7 @@ DisplayObject.prototype.destroy = function ()
     this.filterArea = null;
 };
 
-},{"../const":6,"../math":12,"../textures/RenderTexture":40,"eventemitter3":3}],9:[function(require,module,exports){
+},{"../const":6,"../math":12,"../textures/RenderTexture":45,"eventemitter3":3}],9:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI core library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -2937,7 +2937,7 @@ var core = module.exports = Object.assign(require('./const'), require('./math'),
     //}
 });
 
-},{"./const":6,"./display/Container":7,"./display/DisplayObject":8,"./math":12,"./renderers/canvas/CanvasRenderer":14,"./renderers/canvas/utils/CanvasBuffer":15,"./renderers/canvas/utils/CanvasGraphics":16,"./sprites/Sprite":37,"./sprites/webgl/SpriteRenderer":38,"./textures/BaseTexture":39,"./textures/Texture":41,"./textures/TextureUvs":42,"./ticker":45,"./utils":46}],10:[function(require,module,exports){
+},{"./const":6,"./display/Container":7,"./display/DisplayObject":8,"./math":12,"./renderers/canvas/CanvasRenderer":19,"./renderers/canvas/utils/CanvasBuffer":20,"./renderers/canvas/utils/CanvasGraphics":21,"./sprites/Sprite":42,"./sprites/webgl/SpriteRenderer":43,"./textures/BaseTexture":44,"./textures/Texture":46,"./textures/TextureUvs":47,"./ticker":50,"./utils":51}],10:[function(require,module,exports){
 var Point = require('./Point');
 
 /**
@@ -3382,14 +3382,486 @@ module.exports = {
     Point:      require('./Point'),
     Matrix:     require('./Matrix'),
 
-    //Circle:     require('./shapes/Circle'),
-    //Ellipse:    require('./shapes/Ellipse'),
-    //Polygon:    require('./shapes/Polygon'),
-    //Rectangle:  require('./shapes/Rectangle'),
-    //RoundedRectangle: require('./shapes/RoundedRectangle')
+    Circle:     require('./shapes/Circle'),
+    Ellipse:    require('./shapes/Ellipse'),
+    Polygon:    require('./shapes/Polygon'),
+    Rectangle:  require('./shapes/Rectangle'),
+    RoundedRectangle: require('./shapes/RoundedRectangle')
 };
 
-},{"./Matrix":10,"./Point":11}],13:[function(require,module,exports){
+},{"./Matrix":10,"./Point":11,"./shapes/Circle":13,"./shapes/Ellipse":14,"./shapes/Polygon":15,"./shapes/Rectangle":16,"./shapes/RoundedRectangle":17}],13:[function(require,module,exports){
+var Rectangle = require('./Rectangle'),
+    CONST = require('../../const');
+
+/**
+ * The Circle object can be used to specify a hit area for displayObjects
+ *
+ * @class
+ * @memberof PIXI
+ * @param x {number} The X coordinate of the center of this circle
+ * @param y {number} The Y coordinate of the center of this circle
+ * @param radius {number} The radius of the circle
+ */
+function Circle(x, y, radius)
+{
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.x = x || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.y = y || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.radius = radius || 0;
+
+    /**
+     * The type of the object, mainly used to avoid `instanceof` checks
+     *
+     * @member {number}
+     */
+    this.type = CONST.SHAPES.CIRC;
+}
+
+Circle.prototype.constructor = Circle;
+module.exports = Circle;
+
+/**
+ * Creates a clone of this Circle instance
+ *
+ * @return {Circle} a copy of the Circle
+ */
+Circle.prototype.clone = function ()
+{
+    return new Circle(this.x, this.y, this.radius);
+};
+
+/**
+ * Checks whether the x and y coordinates given are contained within this circle
+ *
+ * @param x {number} The X coordinate of the point to test
+ * @param y {number} The Y coordinate of the point to test
+ * @return {boolean} Whether the x/y coordinates are within this Circle
+ */
+Circle.prototype.contains = function (x, y)
+{
+    if (this.radius <= 0)
+    {
+        return false;
+    }
+
+    var dx = (this.x - x),
+        dy = (this.y - y),
+        r2 = this.radius * this.radius;
+
+    dx *= dx;
+    dy *= dy;
+
+    return (dx + dy <= r2);
+};
+
+/**
+* Returns the framing rectangle of the circle as a Rectangle object
+*
+* @return {Rectangle} the framing rectangle
+*/
+Circle.prototype.getBounds = function ()
+{
+    return new Rectangle(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+};
+
+},{"../../const":6,"./Rectangle":16}],14:[function(require,module,exports){
+var Rectangle = require('./Rectangle'),
+    CONST = require('../../const');
+
+/**
+ * The Ellipse object can be used to specify a hit area for displayObjects
+ *
+ * @class
+ * @memberof PIXI
+ * @param x {number} The X coordinate of the center of the ellipse
+ * @param y {number} The Y coordinate of the center of the ellipse
+ * @param width {number} The half width of this ellipse
+ * @param height {number} The half height of this ellipse
+ */
+function Ellipse(x, y, width, height)
+{
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.x = x || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.y = y || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.width = width || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.height = height || 0;
+
+    /**
+     * The type of the object, mainly used to avoid `instanceof` checks
+     *
+     * @member {number}
+     */
+    this.type = CONST.SHAPES.ELIP;
+}
+
+Ellipse.prototype.constructor = Ellipse;
+module.exports = Ellipse;
+
+/**
+ * Creates a clone of this Ellipse instance
+ *
+ * @return {Ellipse} a copy of the ellipse
+ */
+Ellipse.prototype.clone = function ()
+{
+    return new Ellipse(this.x, this.y, this.width, this.height);
+};
+
+/**
+ * Checks whether the x and y coordinates given are contained within this ellipse
+ *
+ * @param x {number} The X coordinate of the point to test
+ * @param y {number} The Y coordinate of the point to test
+ * @return {boolean} Whether the x/y coords are within this ellipse
+ */
+Ellipse.prototype.contains = function (x, y)
+{
+    if (this.width <= 0 || this.height <= 0)
+    {
+        return false;
+    }
+
+    //normalize the coords to an ellipse with center 0,0
+    var normx = ((x - this.x) / this.width),
+        normy = ((y - this.y) / this.height);
+
+    normx *= normx;
+    normy *= normy;
+
+    return (normx + normy <= 1);
+};
+
+/**
+ * Returns the framing rectangle of the ellipse as a Rectangle object
+ *
+ * @return {Rectangle} the framing rectangle
+ */
+Ellipse.prototype.getBounds = function ()
+{
+    return new Rectangle(this.x - this.width, this.y - this.height, this.width, this.height);
+};
+
+},{"../../const":6,"./Rectangle":16}],15:[function(require,module,exports){
+var Point = require('../Point'),
+    CONST = require('../../const');
+
+/**
+ * @class
+ * @memberof PIXI
+ * @param points {Point[]|number[]|...Point|...number} This can be an array of Points that form the polygon,
+ *      a flat array of numbers that will be interpreted as [x,y, x,y, ...], or the arguments passed can be
+ *      all the points of the polygon e.g. `new PIXI.Polygon(new PIXI.Point(), new PIXI.Point(), ...)`, or the
+ *      arguments passed can be flat x,y values e.g. `new Polygon(x,y, x,y, x,y, ...)` where `x` and `y` are
+ *      Numbers.
+ */
+function Polygon(points_)
+{
+    // prevents an argument assignment deopt
+    // see section 3.1: https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
+    var points = points_;
+
+    //if points isn't an array, use arguments as the array
+    if (!Array.isArray(points))
+    {
+        // prevents an argument leak deopt
+        // see section 3.2: https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
+        points = new Array(arguments.length);
+
+        for (var a = 0; a < points.length; ++a) {
+            points[a] = arguments[a];
+        }
+    }
+
+    // if this is an array of points, convert it to a flat array of numbers
+    if (points[0] instanceof Point)
+    {
+        var p = [];
+        for (var i = 0, il = points.length; i < il; i++)
+        {
+            p.push(points[i].x, points[i].y);
+        }
+
+        points = p;
+    }
+
+    this.closed = true;
+
+    /**
+     * An array of the points of this polygon
+     *
+     * @member {number[]}
+     */
+    this.points = points;
+
+    /**
+     * The type of the object, mainly used to avoid `instanceof` checks
+     *
+     * @member {number}
+     */
+    this.type = CONST.SHAPES.POLY;
+}
+
+Polygon.prototype.constructor = Polygon;
+module.exports = Polygon;
+
+/**
+ * Creates a clone of this polygon
+ *
+ * @return {Polygon} a copy of the polygon
+ */
+Polygon.prototype.clone = function ()
+{
+    return new Polygon(this.points.slice());
+};
+
+/**
+ * Checks whether the x and y coordinates passed to this function are contained within this polygon
+ *
+ * @param x {number} The X coordinate of the point to test
+ * @param y {number} The Y coordinate of the point to test
+ * @return {boolean} Whether the x/y coordinates are within this polygon
+ */
+Polygon.prototype.contains = function (x, y)
+{
+    var inside = false;
+
+    // use some raycasting to test hits
+    // https://github.com/substack/point-in-polygon/blob/master/index.js
+    var length = this.points.length / 2;
+
+    for (var i = 0, j = length - 1; i < length; j = i++)
+    {
+        var xi = this.points[i * 2], yi = this.points[i * 2 + 1],
+            xj = this.points[j * 2], yj = this.points[j * 2 + 1],
+            intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+
+        if (intersect)
+        {
+            inside = !inside;
+        }
+    }
+
+    return inside;
+};
+
+},{"../../const":6,"../Point":11}],16:[function(require,module,exports){
+var CONST = require('../../const');
+
+/**
+ * the Rectangle object is an area defined by its position, as indicated by its top-left corner point (x, y) and by its width and its height.
+ *
+ * @class
+ * @memberof PIXI
+ * @param x {number} The X coordinate of the upper-left corner of the rectangle
+ * @param y {number} The Y coordinate of the upper-left corner of the rectangle
+ * @param width {number} The overall width of this rectangle
+ * @param height {number} The overall height of this rectangle
+ */
+function Rectangle(x, y, width, height)
+{
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.x = x || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.y = y || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.width = width || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.height = height || 0;
+
+    /**
+     * The type of the object, mainly used to avoid `instanceof` checks
+     *
+     * @member {number}
+     */
+    this.type = CONST.SHAPES.RECT;
+}
+
+Rectangle.prototype.constructor = Rectangle;
+module.exports = Rectangle;
+
+/**
+ * A constant empty rectangle.
+ *
+ * @static
+ * @constant
+ */
+Rectangle.EMPTY = new Rectangle(0, 0, 0, 0);
+
+
+/**
+ * Creates a clone of this Rectangle
+ *
+ * @return {Rectangle} a copy of the rectangle
+ */
+Rectangle.prototype.clone = function ()
+{
+    return new Rectangle(this.x, this.y, this.width, this.height);
+};
+
+/**
+ * Checks whether the x and y coordinates given are contained within this Rectangle
+ *
+ * @param x {number} The X coordinate of the point to test
+ * @param y {number} The Y coordinate of the point to test
+ * @return {boolean} Whether the x/y coordinates are within this Rectangle
+ */
+Rectangle.prototype.contains = function (x, y)
+{
+    if (this.width <= 0 || this.height <= 0)
+    {
+        return false;
+    }
+
+    if (x >= this.x && x < this.x + this.width)
+    {
+        if (y >= this.y && y < this.y + this.height)
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+},{"../../const":6}],17:[function(require,module,exports){
+var CONST = require('../../const');
+
+/**
+ * The Rounded Rectangle object is an area that has nice rounded corners, as indicated by its top-left corner point (x, y) and by its width and its height and its radius.
+ *
+ * @class
+ * @memberof PIXI
+ * @param x {number} The X coordinate of the upper-left corner of the rounded rectangle
+ * @param y {number} The Y coordinate of the upper-left corner of the rounded rectangle
+ * @param width {number} The overall width of this rounded rectangle
+ * @param height {number} The overall height of this rounded rectangle
+ * @param radius {number} Controls the radius of the rounded corners
+ */
+function RoundedRectangle(x, y, width, height, radius)
+{
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.x = x || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.y = y || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.width = width || 0;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.height = height || 0;
+
+    /**
+     * @member {number}
+     * @default 20
+     */
+    this.radius = radius || 20;
+
+    /**
+     * The type of the object, mainly used to avoid `instanceof` checks
+     *
+     * @member {number}
+     */
+    this.type = CONST.SHAPES.RREC;
+}
+
+RoundedRectangle.prototype.constructor = RoundedRectangle;
+module.exports = RoundedRectangle;
+
+/**
+ * Creates a clone of this Rounded Rectangle
+ *
+ * @return {RoundedRectangle} a copy of the rounded rectangle
+ */
+RoundedRectangle.prototype.clone = function ()
+{
+    return new RoundedRectangle(this.x, this.y, this.width, this.height, this.radius);
+};
+
+/**
+ * Checks whether the x and y coordinates given are contained within this Rounded Rectangle
+ *
+ * @param x {number} The X coordinate of the point to test
+ * @param y {number} The Y coordinate of the point to test
+ * @return {boolean} Whether the x/y coordinates are within this Rounded Rectangle
+ */
+RoundedRectangle.prototype.contains = function (x, y)
+{
+    if (this.width <= 0 || this.height <= 0)
+    {
+        return false;
+    }
+
+    if (x >= this.x && x <= this.x + this.width)
+    {
+        if (y >= this.y && y <= this.y + this.height)
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+},{"../../const":6}],18:[function(require,module,exports){
 var utils = require('../utils'),
     math = require('../math'),
     CONST = require('../const'),
@@ -3631,7 +4103,7 @@ SystemRenderer.prototype.destroy = function (removeView) {
     this._backgroundColorString = null;
 };
 
-},{"../const":6,"../math":12,"../utils":46,"eventemitter3":3}],14:[function(require,module,exports){
+},{"../const":6,"../math":12,"../utils":51,"eventemitter3":3}],19:[function(require,module,exports){
 var SystemRenderer = require('../SystemRenderer'),
     CanvasMaskManager = require('./utils/CanvasMaskManager'),
     utils = require('../../utils'),
@@ -3916,7 +4388,7 @@ CanvasRenderer.prototype._mapBlendModes = function ()
     }
 };
 
-},{"../../const":6,"../../math":12,"../../utils":46,"../SystemRenderer":13,"./utils/CanvasMaskManager":17}],15:[function(require,module,exports){
+},{"../../const":6,"../../math":12,"../../utils":51,"../SystemRenderer":18,"./utils/CanvasMaskManager":22}],20:[function(require,module,exports){
 /**
  * Creates a Canvas element of the given size.
  *
@@ -4016,7 +4488,7 @@ CanvasBuffer.prototype.destroy = function ()
     this.canvas = null;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var CONST = require('../../../const');
 
 /**
@@ -4369,7 +4841,7 @@ CanvasGraphics.updateGraphicsTint = function (graphics)
 };
 
 
-},{"../../../const":6}],17:[function(require,module,exports){
+},{"../../../const":6}],22:[function(require,module,exports){
 var CanvasGraphics = require('./CanvasGraphics');
 
 /**
@@ -4431,7 +4903,7 @@ CanvasMaskManager.prototype.popMask = function (renderer)
 
 CanvasMaskManager.prototype.destroy = function () {};
 
-},{"./CanvasGraphics":16}],18:[function(require,module,exports){
+},{"./CanvasGraphics":21}],23:[function(require,module,exports){
 var utils = require('../../../utils');
 
 /**
@@ -4665,7 +5137,7 @@ CanvasTinter.canUseMultiply = utils.canUseNewCanvasBlendModes();
  */
 CanvasTinter.tintMethod = CanvasTinter.canUseMultiply ? CanvasTinter.tintWithMultiply :  CanvasTinter.tintWithPerPixel;
 
-},{"../../../utils":46}],19:[function(require,module,exports){
+},{"../../../utils":51}],24:[function(require,module,exports){
 var SystemRenderer = require('../SystemRenderer'),
     ShaderManager = require('./managers/ShaderManager'),
     MaskManager = require('./managers/MaskManager'),
@@ -5210,7 +5682,7 @@ WebGLRenderer.prototype._mapGlModes = function ()
     }
 };
 
-},{"../../const":6,"../../utils":46,"../SystemRenderer":13,"./filters/FXAAFilter":21,"./managers/BlendModeManager":23,"./managers/FilterManager":24,"./managers/MaskManager":25,"./managers/ShaderManager":26,"./managers/StencilManager":27,"./utils/ObjectRenderer":33,"./utils/RenderTarget":35}],20:[function(require,module,exports){
+},{"../../const":6,"../../utils":51,"../SystemRenderer":18,"./filters/FXAAFilter":26,"./managers/BlendModeManager":28,"./managers/FilterManager":29,"./managers/MaskManager":30,"./managers/ShaderManager":31,"./managers/StencilManager":32,"./utils/ObjectRenderer":38,"./utils/RenderTarget":40}],25:[function(require,module,exports){
 var DefaultShader = require('../shaders/TextureShader');
 
 /**
@@ -5328,7 +5800,7 @@ AbstractFilter.prototype.apply = function (frameBuffer)
 };
 */
 
-},{"../shaders/TextureShader":32}],21:[function(require,module,exports){
+},{"../shaders/TextureShader":37}],26:[function(require,module,exports){
 var AbstractFilter = require('./AbstractFilter');
 // @see https://github.com/substack/brfs/issues/25
 
@@ -5376,7 +5848,7 @@ FXAAFilter.prototype.applyFilter = function (renderer, input, output)
     filterManager.applyFilter(shader, input, output);
 };
 
-},{"./AbstractFilter":20}],22:[function(require,module,exports){
+},{"./AbstractFilter":25}],27:[function(require,module,exports){
 var AbstractFilter = require('./AbstractFilter'),
     math =  require('../../../math');
 
@@ -5473,7 +5945,7 @@ Object.defineProperties(SpriteMaskFilter.prototype, {
     }
 });
 
-},{"../../../math":12,"./AbstractFilter":20}],23:[function(require,module,exports){
+},{"../../../math":12,"./AbstractFilter":25}],28:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager');
 
 /**
@@ -5516,7 +5988,7 @@ BlendModeManager.prototype.setBlendMode = function (blendMode)
     return true;
 };
 
-},{"./WebGLManager":28}],24:[function(require,module,exports){
+},{"./WebGLManager":33}],29:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     RenderTarget = require('../utils/RenderTarget'),
     CONST = require('../../../const'),
@@ -5952,7 +6424,7 @@ FilterManager.prototype.destroy = function ()
     this.texturePool = null;
 };
 
-},{"../../../const":6,"../../../math":12,"../utils/Quad":34,"../utils/RenderTarget":35,"./WebGLManager":28}],25:[function(require,module,exports){
+},{"../../../const":6,"../../../math":12,"../utils/Quad":39,"../utils/RenderTarget":40,"./WebGLManager":33}],30:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     AlphaMaskFilter = require('../filters/SpriteMaskFilter');
 
@@ -6066,7 +6538,7 @@ MaskManager.prototype.popStencilMask = function (target, maskData)
 };
 
 
-},{"../filters/SpriteMaskFilter":22,"./WebGLManager":28}],26:[function(require,module,exports){
+},{"../filters/SpriteMaskFilter":27,"./WebGLManager":33}],31:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     TextureShader = require('../shaders/TextureShader'),
     ComplexPrimitiveShader = require('../shaders/ComplexPrimitiveShader'),
@@ -6233,7 +6705,7 @@ ShaderManager.prototype.destroy = function ()
     this.tempAttribState = null;
 };
 
-},{"../../../utils":46,"../shaders/ComplexPrimitiveShader":29,"../shaders/PrimitiveShader":30,"../shaders/TextureShader":32,"./WebGLManager":28}],27:[function(require,module,exports){
+},{"../../../utils":51,"../shaders/ComplexPrimitiveShader":34,"../shaders/PrimitiveShader":35,"../shaders/TextureShader":37,"./WebGLManager":33}],32:[function(require,module,exports){
 var WebGLManager = require('./WebGLManager'),
     utils = require('../../../utils');
 
@@ -6577,7 +7049,7 @@ WebGLMaskManager.prototype.popMask = function (maskData)
 };
 
 
-},{"../../../utils":46,"./WebGLManager":28}],28:[function(require,module,exports){
+},{"../../../utils":51,"./WebGLManager":33}],33:[function(require,module,exports){
 /**
  * @class
  * @memberof PIXI
@@ -6618,7 +7090,7 @@ WebGLManager.prototype.destroy = function ()
     this.renderer = null;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
@@ -6678,7 +7150,7 @@ ComplexPrimitiveShader.prototype = Object.create(Shader.prototype);
 ComplexPrimitiveShader.prototype.constructor = ComplexPrimitiveShader;
 module.exports = ComplexPrimitiveShader;
 
-},{"./Shader":31}],30:[function(require,module,exports){
+},{"./Shader":36}],35:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
@@ -6739,7 +7211,7 @@ PrimitiveShader.prototype = Object.create(Shader.prototype);
 PrimitiveShader.prototype.constructor = PrimitiveShader;
 module.exports = PrimitiveShader;
 
-},{"./Shader":31}],31:[function(require,module,exports){
+},{"./Shader":36}],36:[function(require,module,exports){
 /*global console */
 var utils = require('../../../utils');
 
@@ -7297,7 +7769,7 @@ Shader.prototype._glCompile = function (type, src)
     return shader;
 };
 
-},{"../../../utils":46}],32:[function(require,module,exports){
+},{"../../../utils":51}],37:[function(require,module,exports){
 var Shader = require('./Shader');
 
 /**
@@ -7394,7 +7866,7 @@ TextureShader.defaultFragmentSrc = [
     '}'
 ].join('\n');
 
-},{"./Shader":31}],33:[function(require,module,exports){
+},{"./Shader":36}],38:[function(require,module,exports){
 var WebGLManager = require('../managers/WebGLManager');
 
 /**
@@ -7451,7 +7923,7 @@ ObjectRenderer.prototype.render = function (object) // jshint unused:false
     // render the object
 };
 
-},{"../managers/WebGLManager":28}],34:[function(require,module,exports){
+},{"../managers/WebGLManager":33}],39:[function(require,module,exports){
 /**
  * Helper class to create a quad
  * @class
@@ -7597,7 +8069,7 @@ module.exports = Quad;
 
 
 
-},{}],35:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var math = require('../../../math'),
     utils = require('../../../utils'),
     CONST = require('../../../const'),
@@ -7903,7 +8375,7 @@ RenderTarget.prototype.destroy = function()
     this.texture = null;
 };
 
-},{"../../../const":6,"../../../math":12,"../../../utils":46,"./StencilMaskStack":36}],36:[function(require,module,exports){
+},{"../../../const":6,"../../../math":12,"../../../utils":51,"./StencilMaskStack":41}],41:[function(require,module,exports){
 /**
  * Generic Mask Stack data structure
  * @class
@@ -7937,7 +8409,7 @@ function StencilMaskStack()
 StencilMaskStack.prototype.constructor = StencilMaskStack;
 module.exports = StencilMaskStack;
 
-},{}],37:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var math = require('../math'),
     Texture = require('../textures/Texture'),
     Container = require('../display/Container'),
@@ -8501,7 +8973,7 @@ Sprite.fromImage = function (imageId, crossorigin, scaleMode)
     return new Sprite(Texture.fromImage(imageId, crossorigin, scaleMode));
 };
 
-},{"../const":6,"../display/Container":7,"../math":12,"../renderers/canvas/utils/CanvasTinter":18,"../textures/Texture":41,"../utils":46}],38:[function(require,module,exports){
+},{"../const":6,"../display/Container":7,"../math":12,"../renderers/canvas/utils/CanvasTinter":23,"../textures/Texture":46,"../utils":51}],43:[function(require,module,exports){
 var ObjectRenderer = require('../../renderers/webgl/utils/ObjectRenderer'),
     WebGLRenderer = require('../../renderers/webgl/WebGLRenderer'),
     CONST = require('../../const');
@@ -8969,7 +9441,7 @@ SpriteRenderer.prototype.destroy = function ()
     this.shader = null;
 };
 
-},{"../../const":6,"../../renderers/webgl/WebGLRenderer":19,"../../renderers/webgl/utils/ObjectRenderer":33}],39:[function(require,module,exports){
+},{"../../const":6,"../../renderers/webgl/WebGLRenderer":24,"../../renderers/webgl/utils/ObjectRenderer":38}],44:[function(require,module,exports){
 var utils = require('../utils'),
     CONST = require('../const'),
     EventEmitter = require('eventemitter3');
@@ -9402,7 +9874,7 @@ BaseTexture.fromCanvas = function (canvas, scaleMode)
     return baseTexture;
 };
 
-},{"../const":6,"../utils":46,"eventemitter3":3}],40:[function(require,module,exports){
+},{"../const":6,"../utils":51,"eventemitter3":3}],45:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     Texture = require('./Texture'),
     RenderTarget = require('../renderers/webgl/utils/RenderTarget'),
@@ -9893,7 +10365,7 @@ RenderTexture.prototype.getPixel = function (x, y)
     }
 };
 
-},{"../const":6,"../math":12,"../renderers/canvas/utils/CanvasBuffer":15,"../renderers/webgl/managers/FilterManager":24,"../renderers/webgl/utils/RenderTarget":35,"./BaseTexture":39,"./Texture":41}],41:[function(require,module,exports){
+},{"../const":6,"../math":12,"../renderers/canvas/utils/CanvasBuffer":20,"../renderers/webgl/managers/FilterManager":29,"../renderers/webgl/utils/RenderTarget":40,"./BaseTexture":44,"./Texture":46}],46:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     VideoBaseTexture = require('./VideoBaseTexture'),
     TextureUvs = require('./TextureUvs'),
@@ -10299,7 +10771,7 @@ Texture.removeTextureFromCache = function (id)
 
 Texture.EMPTY = new Texture(new BaseTexture());
 
-},{"../math":12,"../utils":46,"./BaseTexture":39,"./TextureUvs":42,"./VideoBaseTexture":43,"eventemitter3":3}],42:[function(require,module,exports){
+},{"../math":12,"../utils":51,"./BaseTexture":44,"./TextureUvs":47,"./VideoBaseTexture":48,"eventemitter3":3}],47:[function(require,module,exports){
 
 /**
  * A standard object to store the Uvs of a texture
@@ -10367,7 +10839,7 @@ TextureUvs.prototype.set = function (frame, baseFrame, rotate)
     }
 };
 
-},{}],43:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var BaseTexture = require('./BaseTexture'),
     utils = require('../utils');
 
@@ -10600,7 +11072,7 @@ function createSource(path, type)
     return source;
 }
 
-},{"../utils":46,"./BaseTexture":39}],44:[function(require,module,exports){
+},{"../utils":51,"./BaseTexture":44}],49:[function(require,module,exports){
 var CONST = require('../const'),
     EventEmitter = require('eventemitter3'),
     // Internal event used by composed emitter
@@ -10951,7 +11423,7 @@ Ticker.prototype.update = function update(currentTime)
 
 module.exports = Ticker;
 
-},{"../const":6,"eventemitter3":3}],45:[function(require,module,exports){
+},{"../const":6,"eventemitter3":3}],50:[function(require,module,exports){
 /**
  * @file        Main export of the PIXI extras library
  * @author      Mat Groves <mat@goodboydigital.com>
@@ -11013,7 +11485,7 @@ module.exports = {
     Ticker: Ticker
 };
 
-},{"./Ticker":44}],46:[function(require,module,exports){
+},{"./Ticker":49}],51:[function(require,module,exports){
 var CONST = require('../const');
 
 /**
@@ -11252,7 +11724,7 @@ var utils = module.exports = {
     BaseTextureCache: {}
 };
 
-},{"../const":6,"./pluginTarget":47,"async":1}],47:[function(require,module,exports){
+},{"../const":6,"./pluginTarget":52,"async":1}],52:[function(require,module,exports){
 /**
  * Mixins functionality to make an object have "plugins".
  *
@@ -11322,7 +11794,7 @@ module.exports = {
     }
 };
 
-},{}],48:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (global){
 // run the polyfills
 require('./polyfill');
@@ -11354,7 +11826,7 @@ global.PIXI = core;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./core":9,"./polyfill":50}],49:[function(require,module,exports){
+},{"./core":9,"./polyfill":55}],54:[function(require,module,exports){
 // References:
 // https://github.com/sindresorhus/object-assign
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
@@ -11364,11 +11836,11 @@ if (!Object.assign)
     Object.assign = require('object-assign');
 }
 
-},{"object-assign":4}],50:[function(require,module,exports){
+},{"object-assign":4}],55:[function(require,module,exports){
 require('./Object.assign');
 require('./requestAnimationFrame');
 
-},{"./Object.assign":49,"./requestAnimationFrame":51}],51:[function(require,module,exports){
+},{"./Object.assign":54,"./requestAnimationFrame":56}],56:[function(require,module,exports){
 (function (global){
 // References:
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -11439,7 +11911,7 @@ if (!global.cancelAnimationFrame) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}]},{},[48])(48)
+},{}]},{},[53])(53)
 });
 
 
